@@ -41,7 +41,6 @@ namespace FedGraph.Main
             {
                 JsonSerializer serializer= new JsonSerializer(); 
                 config = (Config) serializer.Deserialize(file, typeof(Config));
-                Console.WriteLine(config.vertexes[0].id);
             }
             return config;
         }
@@ -49,7 +48,7 @@ namespace FedGraph.Main
         {
             using (StreamWriter file = File.CreateText(filename))
             {
-                JsonSerializer serializer= new JsonSerializer();
+                JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, config);
             }
         }
