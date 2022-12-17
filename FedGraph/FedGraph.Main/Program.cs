@@ -24,7 +24,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-Parsing.parse();
+Config config = Parsing.parse();
+Parsing.serialize(config, "config2.json");
 
 app.Run();
 

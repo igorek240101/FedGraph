@@ -34,14 +34,23 @@ namespace FedGraph.Main
     }
     public class Parsing
     {
-        public static void parse()
+        public static Config parse()
         {
-            string configFileName = "config.json";
+            Config config;
             using (StreamReader file = File.OpenText("config.json"))
             {
                 JsonSerializer serializer= new JsonSerializer(); 
-                Config config = (Config) serializer.Deserialize(file, typeof(Config));
+                config = (Config) serializer.Deserialize(file, typeof(Config));
                 Console.WriteLine(config.vertexes[0].id);
+            }
+            return config;
+        }
+        public static void serialize(Config config, string filename)
+        {
+            using (StreamWriter file = File.CreateText(filename))
+            {
+                JsonSerializer serializer= new JsonSerializer();
+                serializer.Serialize(file, config);
             }
         }
     }
