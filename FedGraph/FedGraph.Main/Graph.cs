@@ -4,10 +4,15 @@
     {
         private int vertexesNum;
         private int[,] matrix;
+        private int[] visited;
+        private Path path;
+
         public Graph(int vertexesNum)
         {
             this.vertexesNum = vertexesNum;
             this.matrix = new int[vertexesNum, vertexesNum];
+            this.visited = new int[vertexesNum];
+            path = new Path(new Vertex(1, ""), 0, null);
         }
         
         public void fillMatrix(Config config)
