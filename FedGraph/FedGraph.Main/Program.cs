@@ -24,6 +24,11 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+Config config = Parsing.parse();
+Graph graph = new Graph(config.vertexes.Count());
+graph.fillMatrix(config);
+graph.printMatrix();
+
 app.Run();
 
 
