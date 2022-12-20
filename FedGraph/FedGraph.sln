@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32811.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FedGraph.Client", "FedGraph.Client\FedGraph.Client.csproj", "{0ED95E94-004E-4BBE-B5B8-F431411284D3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FedGraph.Main", "FedGraph.Main\FedGraph.Main.csproj", "{2BAC63E3-C42F-4BF1-97D3-B51CD0773765}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0ED95E94-004E-4BBE-B5B8-F431411284D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0ED95E94-004E-4BBE-B5B8-F431411284D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0ED95E94-004E-4BBE-B5B8-F431411284D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0ED95E94-004E-4BBE-B5B8-F431411284D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BAC63E3-C42F-4BF1-97D3-B51CD0773765}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BAC63E3-C42F-4BF1-97D3-B51CD0773765}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BAC63E3-C42F-4BF1-97D3-B51CD0773765}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BAC63E3-C42F-4BF1-97D3-B51CD0773765}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1432A38A-FE67-48ED-8EC0-5C8A4CF1C954}
+	EndGlobalSection
+EndGlobal
