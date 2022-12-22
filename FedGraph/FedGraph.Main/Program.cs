@@ -25,9 +25,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 Config config = Parsing.parse();
-Graph graph = new Graph(config.vertexes.Count());
-graph.fillMatrix(config);
+Graph graph = new Graph(config);
 graph.printMatrix();
+
+app.Run(async (context) => await context.Response.WriteAsync("Hello METANIT.COM"));
 
 app.Run();
 

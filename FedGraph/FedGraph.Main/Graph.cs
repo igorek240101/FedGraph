@@ -1,21 +1,29 @@
-﻿namespace FedGraph.Main
+﻿using System.Collections.Generic;
+
+namespace FedGraph.Main
 {
     public class Graph
     {
         private int vertexesNum;
-        private int[,] matrix;
-        private int[] visited;
-        private Path path;
+        private int[,] matrix; // Матрица смежности
+        private int[] visited; // Посещённые вершины
+        private Dictionary<int, Path> pathes; // Словарь key: id, value: Path - путь до вершины
+        private int[] adj_vertexes; // граничащие вершины
 
-        public Graph(int vertexesNum)
+        public Graph(Config config)
         {
-            this.vertexesNum = vertexesNum;
+            this.vertexesNum = config.vertexes.Count();
             this.matrix = new int[vertexesNum, vertexesNum];
             this.visited = new int[vertexesNum];
-            path = new Path(new Vertex(1, ""), 0, null);
+            this.pathes = new Dictionary<int, Path>();
+
+
+
+            fillMatrix(config);
         }
         
-        public void fillMatrix(Config config)
+        // Заполняет матрицу смежности из конфига
+        private void fillMatrix(Config config)
         {
             for (int i = 0; i < vertexesNum; i++)
             {
