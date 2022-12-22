@@ -8,7 +8,7 @@ namespace FedGraph.Main
         private int[,] matrix; // Матрица смежности
         private int[] visited; // Посещённые вершины
         private Dictionary<int, Path> pathes; // Словарь key: id, value: Path - путь до вершины
-        private int[] adj_vertexes; // граничащие вершины
+        private List<int> adj_vertexes; // граничащие вершины
 
         public Graph(Config config)
         {
@@ -16,8 +16,14 @@ namespace FedGraph.Main
             this.matrix = new int[vertexesNum, vertexesNum];
             this.visited = new int[vertexesNum];
             this.pathes = new Dictionary<int, Path>();
-
-
+            this.adj_vertexes = new List<int>();
+            for(int i = 0; i < vertexesNum; i++)
+            {
+                if (config.vertexes[i].adj_v.Count() > 0) 
+                {
+                    adj_vertexes.Add(config.vertexes[i].id);
+                }
+            }
 
             fillMatrix(config);
         }
