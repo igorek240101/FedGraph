@@ -43,23 +43,29 @@ namespace FedGraph.Client
                 this.startNodeInvalidLabel.Text = "Поле должно содержать значение";
                 isValid = false;
             }
+            else if (!isDigitsOnly(startNodeValue))
+            {
+                this.startNodeInvalidLabel.Text = "Введены недопустимые символы";
+                isValid = false;
+            } else if (!int.TryParse(startNodeValue, out int value))
+            {
+                this.startNodeInvalidLabel.Text = "Число слишком большое";
+                isValid = false;
+            }
             if (endNodeValue == "")
             {
                 this.endNodeInvalidLabel.Text = "Поле должно содержать значение";
                 isValid = false;
-            }
-            
-            if (!isDigitsOnly(startNodeValue))
-            {
-                this.startNodeInvalidLabel.Text = "Введены недопустимые символы";
-                isValid = false;
-            }
-            if (!isDigitsOnly(endNodeValue))
+            } 
+            else if (!isDigitsOnly(endNodeValue))
             {
                 this.endNodeInvalidLabel.Text = "Введены недопустимые символы";
                 isValid = false;
+            } else if (!int.TryParse(endNodeValue, out int value2))
+            {
+                this.endNodeInvalidLabel.Text = "Число слишком большое";
+                isValid = false;
             }
-            
             return isValid;
         }
 
@@ -67,7 +73,7 @@ namespace FedGraph.Client
         {
             string startNodeValue = this.startNodeTextBox.Text;
             string endNodeValue = this.endNodeTextBox.Text;
-            if (valuesIsValid(startNodeValue, endNodeValue)) { 
+            if (valuesIsValid(startNodeValue, endNodeValue)) {
                 int startNodeNumber = int.Parse(startNodeValue);
                 int endNodeNumber = int.Parse(endNodeValue);
 

@@ -2,11 +2,11 @@
 {
     public class Path
     {
-        public Path prev;
+        public Path? prev;
         public Vertex vertex;
         private int min_length;
 
-        public Path(Vertex vertex, int min_length, Path prev)
+        public Path(Vertex vertex, int min_length, Path? prev)
         {
             this.vertex = vertex;
             this.min_length = min_length;
