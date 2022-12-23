@@ -24,13 +24,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-Config config = Parsing.parse("config2.json");
+Config config = Parsing.parse("config1.json");
 Graph graph = new Graph(config);
 
 //graph.printMatrix();
 graph.dijksra(5, 6);
 //graph.printPathes();
-
 app.Run(async (context) => await context.Response.WriteAsync("Hello METANIT.COM"));
 
 app.Run();
