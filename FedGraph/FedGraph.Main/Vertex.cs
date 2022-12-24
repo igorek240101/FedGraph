@@ -6,19 +6,19 @@ namespace FedGraph.Main
     {
         public int id;
         public string info;
-        private List<Vertex> adj_vertices;
+        private List<int> adj_vertices;
 
         public Vertex(int id, string info)
         {
             this.id = id;
             this.info = info;
-            adj_vertices = new List<Vertex>();
+            adj_vertices = new List<int>();
         }
-        public Vertex getAdjVertex(int id)
+        public int getAdjVertex(int id)
         {
             return adj_vertices[id];
         }
-        public void addAdjVertex(Vertex vertex) 
+        public void addAdjVertex(int vertex) 
         { 
             this.adj_vertices.Add(vertex);
         }
