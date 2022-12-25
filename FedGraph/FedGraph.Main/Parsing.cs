@@ -34,10 +34,10 @@ namespace FedGraph.Main
     }
     public class Parsing
     {
-        public static Config parse()
+        public static Config parse(string filename="config.json")
         {
             Config config;
-            using (StreamReader file = File.OpenText("config.json"))
+            using (StreamReader file = File.OpenText(filename))
             {
                 JsonSerializer serializer= new JsonSerializer(); 
                 config = (Config) serializer.Deserialize(file, typeof(Config));

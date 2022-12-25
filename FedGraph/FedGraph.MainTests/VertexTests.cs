@@ -24,20 +24,18 @@ namespace FedGraph.Main.Tests
         public void addAdjVertexTest_addone()
         {
             int expect_id = 0;
-            Vertex NewVertex = new Vertex(0, "New");
-            TestVertex.addAdjVertex(NewVertex);
-            Vertex actual = TestVertex.getAdjVertex(expect_id);
-            Assert.AreEqual(NewVertex, actual);
+            TestVertex.addAdjVertex(expect_id);
+            int actual = TestVertex.getAdjVertex(expect_id);
+            Assert.AreEqual(expect_id, actual);
         }
         [TestMethod()]
         public void addAdjVertexTest_addmany()
         {
             for (int i = 0; i<=100; i++)
             {
-                Vertex NewVertex = new Vertex(i, "New");
-                TestVertex.addAdjVertex(NewVertex);
-                Vertex actual = TestVertex.getAdjVertex(i);
-                Assert.AreEqual(NewVertex, actual);
+                TestVertex.addAdjVertex(i);
+                int actual = TestVertex.getAdjVertex(i);
+                Assert.AreEqual(i, actual);
             }
             
         }
