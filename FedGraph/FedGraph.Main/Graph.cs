@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using System.Collections.Generic;
+using System.Net;
 
 namespace FedGraph.Main
 {
@@ -11,6 +13,11 @@ namespace FedGraph.Main
         private List<Vertex> adj_vertexes; // граничащие вершины
         private List<Vertex> vertexes;
 
+        private List<CServer> servers; // Список из сереверов
+
+        private int startVertexId;
+        private int endVertexId;
+
         private int[] vertexesIds; // проиндексированные айдишники вершин
 
         public Graph(Config config)
@@ -21,8 +28,10 @@ namespace FedGraph.Main
             this.pathes = new Dictionary<int, Path>();
             this.adj_vertexes = new List<Vertex>();
             this.vertexes = config.vertexes;
-
+            this.startVertexId = -1;
+            this.endVertexId = -1;
             this.vertexesIds = new int[vertexesNum];
+            this.servers = config.servers;
             Console.WriteLine("vertexesNum: " + vertexesNum);
 
             for (int i = 0; i < vertexesNum; i++)
@@ -34,6 +43,22 @@ namespace FedGraph.Main
                 vertexesIds[i] = config.vertexes[i].id;
             }
             fillMatrix(config);
+        }
+
+        public void setStartVertexId(int id)
+        {
+            startVertexId = id;
+        }
+
+        public void setEndVertexId(int id)
+        {
+            endVertexId = id;
+        }
+
+        public bool containsVertex(int id)
+        {
+            if (vertexesIds.Contains(id)) return true;
+            return false;
         }
         private Vertex? getVertexWithId(int id)
         {
@@ -84,59 +109,109 @@ namespace FedGraph.Main
             return id; 
         }
 
-        public void dijksra(int startId, int endId)
+        public async void dijksra(HttpClient client)
         {
-            Path startPath = new Path(getVertexWithId(startId), 0, null);
-            pathes.Add(startId, startPath);
-            while (visited.Count() != vertexesNum)
+            /*
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:7052/api/graph/contains/12");
+            var response = client.Send(request);
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
+            */
+            if (startVertexId != -1)
             {
-                // Получаем вершину с минимальным путём до неё из непоесещённых
-                int vertexId = getVertexIdWithMinLength();
-                Console.WriteLine(vertexId);
-                visited.Add(vertexId);
-                // матричный id - число от 0 до vertexesNum - 1
-                int mId = 0;
-                // Ищем порядковый номер айдишника вершины
-                for (mId = 0; mId < vertexesNum; mId++)
-                    if (vertexesIds[mId] == vertexId)
-                        break;
-                int weight;
-                for(int i = 0; i < vertexesNum; i++)
+                Console.WriteLine("Start");
+                int startId = startVertexId;
+                Path startPath = new Path(getVertexWithId(startId), 0, null);
+                pathes.Add(startId, startPath);
+                while (visited.Count() != vertexesNum)
                 {
-                    if (i != mId)
+                    // Получаем вершину с минимальным путём до неё из непоесещённых
+                    int vertexId = getVertexIdWithMinLength();
+                    visited.Add(vertexId);
+                    // матричный id - число от 0 до vertexesNum - 1
+                    int mId = 0;
+                    // Ищем порядковый номер айдишника вершины
+                    for (mId = 0; mId < vertexesNum; mId++)
+                        if (vertexesIds[mId] == vertexId)
+                            break;
+                    int weight;
+                    for (int i = 0; i < vertexesNum; i++)
                     {
-                        weight = matrix[mId, i];
-                        if (weight > -1)
-                        {
-                            // реальный id - id из конфига
-                            int vertexRealId = vertexesIds[i];
-                            Path prevVertexPath = pathes[vertexId];
-                            int prevVertexLength = prevVertexPath.getMinLength();
-                            if (!pathes.ContainsKey(vertexRealId))
-                            {   
-                                Path path = new Path(vertexes[i], weight + prevVertexLength, prevVertexPath);
-                                pathes.Add(vertexRealId, path);
-                            }
-                            else
+                        if (i != mId) 
+                        { 
+                            weight = matrix[mId, i];
+                            if (weight > -1)
                             {
-                                Path path = pathes[vertexRealId];
-                                if (path.getMinLength() > weight + prevVertexLength)
+                                // реальный id - id из конфига
+                                int vertexRealId = vertexesIds[i];
+                                Path prevVertexPath = pathes[vertexId];
+                                int prevVertexLength = prevVertexPath.getMinLength();
+                                if (!pathes.ContainsKey(vertexRealId))
                                 {
-                                    path.setPrevious(prevVertexPath, weight);
+                                    Path path = new Path(vertexes[i], weight + prevVertexLength, prevVertexPath);
+                                    pathes.Add(vertexRealId, path);
+                                }
+                                else
+                                {
+                                    Path path = pathes[vertexRealId];
+                                    if (path.getMinLength() > weight + prevVertexLength)
+                                    {
+                                        path.setPrevious(prevVertexPath, weight);
+                                    }
                                 }
                             }
                         }
                     }
+                    // Если вершина граничащая
+                    if (isAdjVertex(vertexId))
+                    {
+                        foreach(CServer s in servers)
+                        {
+                            var request = new HttpRequestMessage(HttpMethod.Get, s.address + $"/api/graph/contains/{vertexId}");
+                            var response = await client.SendAsync(request);
+                            if (await response.Content.ReadAsStringAsync() == "true")
+                            {
+                                
+                            }
+                        }
+                    }
                 }
+                Console.WriteLine("End");
+                /*
+                // Восстанавливаем путь
+                List<Path> restoredPath = restorePath(pathes[endId]);
+                // Выводим на экран
+                for (int i = restoredPath.Count() - 1; i >= 0; i--)
+                {
+                    Console.Write(restoredPath[i].vertex.id + " ");
+                }
+                Console.WriteLine();
+                */
             }
-            // Восстанавливаем путь
-            List<Path> restoredPath = restorePath(pathes[endId]);
-            // Выводим на экран
-            for (int i = restoredPath.Count() - 1; i >= 0; i--)
+        }
+
+        public bool isAdjVertex(int vertexId)
+        {
+            foreach (Vertex v in adj_vertexes) {
+               if (v.id == vertexId) { return true; }
+            }
+            return false;
+        }
+
+        public List<Path> getShortestPath()
+        {
+            List<Path> restoredPath = new List<Path>();
+            if (endVertexId != -1)
             {
-                Console.Write(restoredPath[i].vertex.id + " ");
+                restoredPath = restorePath(pathes[endVertexId]);
+                // Выводим на экран
+                for (int i = restoredPath.Count() - 1; i >= 0; i--)
+                {
+                    Console.Write(restoredPath[i].vertex.id + " ");
+                }
+                Console.WriteLine();
+                return restoredPath;
             }
-            Console.WriteLine();
+            return restoredPath;
         }
 
         private List<Path> restorePath (Path path)
