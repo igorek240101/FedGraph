@@ -180,7 +180,10 @@ namespace FedGraph.Main
                                 var response = await client.SendAsync(request);
                                 if (await response.Content.ReadAsStringAsync() == "true")
                                 {
-
+                                    Console.WriteLine($"Server {s.id} {s.address} vertex {vertexId} true");
+                                }else
+                                {
+                                    Console.WriteLine($"Server {s.id} {s.address} vertex {vertexId} false");
                                 }
                             }
                         }

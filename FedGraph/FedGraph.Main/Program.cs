@@ -2,8 +2,6 @@ using FedGraph.Main;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
 // HttpClient для создания запросов из графа
 builder.Services.AddHttpClient();
 
@@ -29,9 +27,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.MapControllers();
+
+//Создаём наш граф
 Application.graph = new Graph(Parsing.parse("config1.json"));
 
-app.MapControllers();
 app.Run();
 
 class Application
