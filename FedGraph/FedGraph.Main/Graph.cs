@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Generic;
 using System.Net;
+using System.Security.Cryptography;
 
 namespace FedGraph.Main
 {
@@ -88,8 +89,8 @@ namespace FedGraph.Main
             {
                 for (int j = 0; j < config.adj_list[i].edges.Count(); j++)
                 {
-                    int v_id = config.adj_list[i].edges[j].id - 1;
-                    matrix[i,v_id] = config.adj_list[i].edges[j].weight;
+                    int v_id = getVertexNum(config.adj_list[i].edges[j].id);
+                    matrix[i, v_id] = config.adj_list[i].edges[j].weight;
                 }
             }
         }
@@ -107,6 +108,15 @@ namespace FedGraph.Main
                 }
             }
             return id; 
+        }
+
+        private int getVertexNum(int id)
+        {
+            int mId;
+            for (mId = 0; mId < vertexesNum; mId++)
+                if (vertexesIds[mId] == id)
+                    break;
+            return mId;
         }
 
         public async void dijksra(HttpClient client)
@@ -128,11 +138,9 @@ namespace FedGraph.Main
                     int vertexId = getVertexIdWithMinLength();
                     visited.Add(vertexId);
                     // матричный id - число от 0 до vertexesNum - 1
-                    int mId = 0;
+
                     // Ищем порядковый номер айдишника вершины
-                    for (mId = 0; mId < vertexesNum; mId++)
-                        if (vertexesIds[mId] == vertexId)
-                            break;
+                    int mId = getVertexNum(vertexId);
                     int weight;
                     for (int i = 0; i < vertexesNum; i++)
                     {
@@ -162,17 +170,23 @@ namespace FedGraph.Main
                         }
                     }
                     // Если вершина граничащая
-                    if (isAdjVertex(vertexId))
+                    try
                     {
-                        foreach(CServer s in servers)
+                        if (isAdjVertex(vertexId))
                         {
-                            var request = new HttpRequestMessage(HttpMethod.Get, s.address + $"/api/graph/contains/{vertexId}");
-                            var response = await client.SendAsync(request);
-                            if (await response.Content.ReadAsStringAsync() == "true")
+                            foreach (CServer s in servers)
                             {
-                                
+                                var request = new HttpRequestMessage(HttpMethod.Get, s.address + $"/api/graph/contains/{vertexId}");
+                                var response = await client.SendAsync(request);
+                                if (await response.Content.ReadAsStringAsync() == "true")
+                                {
+
+                                }
                             }
                         }
+                    } catch (Exception e)
+                    {
+
                     }
                 }
                 Console.WriteLine("End");
