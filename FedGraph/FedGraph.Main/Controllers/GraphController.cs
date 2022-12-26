@@ -16,6 +16,7 @@
         [HttpGet("contains/{id}")]
         public JsonResult GetContainsVertex(int id)
         {
+            Console.WriteLine($"Server contains vertex: {id}");
             if (Application.graph.containsVertex(id))
             {
                 return new JsonResult(true);

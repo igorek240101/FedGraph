@@ -74,11 +74,22 @@ namespace FedGraph.Client
             string startNodeValue = this.startNodeTextBox.Text;
             string endNodeValue = this.endNodeTextBox.Text;
             if (valuesIsValid(startNodeValue, endNodeValue)) {
-                int startNodeNumber = int.Parse(startNodeValue);
-                int endNodeNumber = int.Parse(endNodeValue);
+                int startVertexId = int.Parse(startNodeValue);
+                int endVertexId = int.Parse(endNodeValue);
 
                 // Запускаем алгоритм поиска кратчайшего пути
+                Service.dijkstra(startVertexId, endVertexId);
             }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label8_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
