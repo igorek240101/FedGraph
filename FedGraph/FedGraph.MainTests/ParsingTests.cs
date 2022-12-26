@@ -21,7 +21,7 @@ namespace FedGraph.Main.Tests
         [TestMethod()]
         public void parseTest_Id_Vertex9()
         {
-            CVertex actual_vertex;
+            Vertex actual_vertex;
             int actual_id;
             int expected_id;
             for (int i=0; i<9; i++)
