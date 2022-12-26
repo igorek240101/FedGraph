@@ -1,0 +1,58 @@
+﻿{
+  "vertexes": [
+    {
+      "id": 7,
+      "info": "",
+      "adj_vertices": [5]
+    },
+    {
+      "id": 8,
+      "info": "",
+      "adj_vertices": [6]
+    },
+    {
+      "id": 9,
+      "info": "",
+      "adj_vertices": []
+    }
+  ],
+  "servers": [
+    {
+      "id": 1,
+      "address": "https://localhost:5001"
+    },
+    {
+      "id": 2,
+      "address": "https://localhost:5002"
+    }
+  ],
+  "adj_list": [
+    {
+      "id": 7,
+      "edges": [
+        {
+          "id": 9,
+          "weight": 9
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "edges": [
+        {
+          "id": 9,
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "edges": [
+        {
+          "id": 8,
+          "weight": 3
+        }
+      ]
+    }
+  ]
+}

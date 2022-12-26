@@ -1,4 +1,4 @@
-﻿{
+{
   "vertexes": [
     {
       "id": 1,
@@ -23,12 +23,12 @@
     {
       "id": 5,
       "info": "",
-      "adj_vertices": [ 7 ]
+      "adj_vertices": [7]
     },
     {
       "id": 6,
       "info": "",
-      "adj_vertices": [ 8 ]
+      "adj_vertices": [8]
     }
   ],
   "servers": [

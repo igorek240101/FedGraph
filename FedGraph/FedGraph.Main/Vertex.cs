@@ -4,9 +4,9 @@ namespace FedGraph.Main
 {
     public class Vertex
     {
-        public int id;
-        public string info;
-        private List<int> adj_vertices;
+        public int id { get; set; }
+        public string info { get; set; }
+        public List<int> adj_vertices { get; set; }
 
         public Vertex(int id, string info)
         {

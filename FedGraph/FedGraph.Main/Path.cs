@@ -2,9 +2,9 @@
 {
     public class Path
     {
-        public Path? prev;
-        public Vertex vertex;
-        private int min_length;
+        public Path? prev { get; set; }
+        public Vertex vertex { get; set;  }
+        public int min_length { get; set; }
 
         public Path(Vertex vertex, int min_length, Path? prev)
         {
