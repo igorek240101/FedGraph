@@ -7,6 +7,18 @@ using Newtonsoft.Json;
 
 namespace FedGraph.Client
 {
+    public class Vertex
+    {
+        public int id { get; set; }
+        public string info { get; set; }
+        public List<int> adj_vertices { get; set; }
+    }
+    public class Path
+    {
+        public Vertex vertex { get; set; }
+        public int min_length { get; set; }
+        public Path prev { get; set; }
+    }
     class Server
     {
         public int id { get; set;}
@@ -18,7 +30,7 @@ namespace FedGraph.Client
     }
     class Parsing
     {
-        public static Config parse(string filename="./config.json")
+        public static Config parse(string filename="../../../config.json")
         {
             Config config;
             using (StreamReader file = File.OpenText(filename))

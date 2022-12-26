@@ -20,8 +20,9 @@ namespace FedGraph.Main
         private int startVertexId;
         private int endVertexId;
 
+        private bool inProgress;
         private int[] vertexesIds; // проиндексированные айдишники вершин
-
+        
         public Graph(Config config)
         {
             this.vertexesNum = config.vertexes.Count();
@@ -46,6 +47,12 @@ namespace FedGraph.Main
             }
             fillMatrix(config);
         }
+
+        public List<Vertex> getAdjVertexes()
+        {
+            return adj_vertexes;
+        }
+
         public int getEdgeWeight(int v1, int v2)
         {
             return this.matrix[v1, v2];
@@ -126,6 +133,7 @@ namespace FedGraph.Main
 
         public async void dijksra(HttpClient client, Path recievedPath=null)
         {
+            inProgress = true;
             if (startVertexId != -1 && containsVertex(startVertexId))
             {
                 Console.WriteLine($"Start {startVertexId}");
@@ -197,6 +205,7 @@ namespace FedGraph.Main
                     // Если вершина граничащая
                     try
                     {
+                        // Если вершина граничащая и при этом не является начальной, потому что в этом случае распараллеливаение производит клиент
                         if (isAdjVertex(vertexId))
                         {
                             foreach (CServer s in servers)
@@ -218,9 +227,13 @@ namespace FedGraph.Main
                     
                 }
                 Console.WriteLine("End");
+                inProgress = false;
             }
         }
-
+        public bool isInProgress()
+        {
+            return inProgress;
+        }
         public bool isAdjVertex(int vertexId)
         {
             foreach (Vertex v in adj_vertexes) {

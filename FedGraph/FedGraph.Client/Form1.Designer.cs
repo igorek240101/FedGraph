@@ -154,6 +154,7 @@
             this.pathLengthLabel.Name = "pathLengthLabel";
             this.pathLengthLabel.Size = new System.Drawing.Size(0, 20);
             this.pathLengthLabel.TabIndex = 11;
+            this.pathLengthLabel.Click += new System.EventHandler(this.pathLengthLabel_Click);
             // 
             // shortestPathLabel
             // 
@@ -220,9 +221,8 @@
             this.debug.AutoSize = true;
             this.debug.Location = new System.Drawing.Point(380, 51);
             this.debug.Name = "debug";
-            this.debug.Size = new System.Drawing.Size(209, 20);
+            this.debug.Size = new System.Drawing.Size(0, 20);
             this.debug.TabIndex = 17;
-            this.debug.Text = "Количество вершин в графе:";
             this.debug.Click += new System.EventHandler(this.label8_Click);
             // 
             // Form1
