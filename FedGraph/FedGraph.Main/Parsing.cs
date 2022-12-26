@@ -34,7 +34,7 @@ namespace FedGraph.Main
     }
     public class Parsing
     {
-        public static Config parse(string filename)
+        public static Config parse(string filename="config.json")
         {
             Config config;
             using (StreamReader file = File.OpenText(filename))
