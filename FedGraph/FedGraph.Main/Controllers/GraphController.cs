@@ -28,18 +28,9 @@
         {
             if (id != null)
             {
-                Console.WriteLine(id);
                 Application.graph.setStartVertexId(id);
-                
-                
                 var client = clientFactory.CreateClient();
                 Application.graph.dijksra(client);
-                /*
-                var request = new HttpRequestMessage(
-                    HttpMethod.Get,
-                    "https://localhost:7052/api/graph/search/end/6");
-                var response = client.Send(request);
-                */
             }
         }
         // Устанавливаем конечную вершину для алгоритма Дейкстры
@@ -50,5 +41,17 @@
             Application.graph.getShortestPath();
         }
 
+        [HttpPost("search/dijkstra")]
+        public JsonResult PostTransitionToAdjVertex([FromBody] Path path)
+        {
+            if (path.prev != null)
+                Console.WriteLine($"Recieved path: {path.vertex.id} len: {path.min_length} prev: {path.prev.vertex.id}");
+            else
+                Console.WriteLine($"Recieved path: {path.vertex.id} len: {path.min_length} prev: null");
+            var client = clientFactory.CreateClient();
+            Application.graph.setStartVertexId(path.vertex.id);
+            Application.graph.dijksra(client, path);
+            return new JsonResult(true);
+        }
     }
 }

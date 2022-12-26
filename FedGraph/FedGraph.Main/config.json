@@ -23,31 +23,23 @@
     {
       "id": 5,
       "info": "",
-      "adj_vertices": []
+      "adj_vertices": [ 7 ]
     },
     {
       "id": 6,
       "info": "",
-      "adj_vertices": []
-    },
-    {
-      "id": 7,
-      "info": "",
-      "adj_vertices": []
-    },
-    {
-      "id": 8,
-      "info": "",
-      "adj_vertices": []
-    },
-    {
-      "id": 9,
-      "info": "",
-      "adj_vertices": []
+      "adj_vertices": [ 8 ]
     }
   ],
   "servers": [
-
+    {
+      "id": 2,
+      "address": "https://localhost:5002"
+    },
+    {
+      "id": 3,
+      "address": "https://localhost:5003"
+    }
   ],
   "adj_list": [
     {
@@ -55,15 +47,11 @@
       "edges": [
         {
           "id": 2,
-          "weight": 1
+          "weight": 8
         },
         {
           "id": 3,
-          "weight": 3
-        },
-        {
-          "id": 4,
-          "weight": 5
+          "weight": 2
         }
       ]
     },
@@ -72,19 +60,15 @@
       "edges": [
         {
           "id": 1,
-          "weight": 1
+          "weight": 8
         },
         {
           "id": 3,
-          "weight": 4
-        },
-        {
-          "id": 4,
-          "weight": 2
+          "weight": 11
         },
         {
           "id": 5,
-          "weight": 7
+          "weight": 3
         }
       ]
     },
@@ -93,15 +77,19 @@
       "edges": [
         {
           "id": 1,
-          "weight": 3
+          "weight": 2
         },
         {
           "id": 2,
-          "weight": 4
+          "weight": 11
         },
         {
           "id": 6,
           "weight": 4
+        },
+        {
+          "id": 4,
+          "weight": 15
         }
       ]
     },
@@ -109,12 +97,8 @@
       "id": 4,
       "edges": [
         {
-          "id": 1,
-          "weight": 5
-        },
-        {
-          "id": 2,
-          "weight": 2
+          "id": 3,
+          "weight": 15
         }
       ]
     },
@@ -123,15 +107,7 @@
       "edges": [
         {
           "id": 2,
-          "weight": 7
-        },
-        {
-          "id": 6,
-          "weight": 2
-        },
-        {
-          "id": 7,
-          "weight": 14
+          "weight": 3
         }
       ]
     },
@@ -141,53 +117,6 @@
         {
           "id": 3,
           "weight": 4
-        },
-        {
-          "id": 5,
-          "weight": 2
-        },
-        {
-          "id": 8,
-          "weight": 22
-        }
-      ]
-    },
-    {
-      "id": 7,
-      "edges": [
-        {
-          "id": 5,
-          "weight": 14,
-        },
-        {
-          "id": 9,
-          "weight": 222
-        }
-      ]
-    },
-    {
-      "id": 8,
-      "edges": [
-        {
-          "id": 6,
-          "weight": 22
-        },
-        {
-          "id": 9,
-          "weight": 1
-        }
-      ]
-    },
-    {
-      "id": 9,
-      "edges": [
-        {
-          "id": 7,
-          "weight": 222
-        },
-        {
-          "id": 8,
-          "weight": 1
         }
       ]
     }

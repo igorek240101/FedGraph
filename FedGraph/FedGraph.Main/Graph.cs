@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Security.Cryptography;
 
@@ -64,7 +65,7 @@ namespace FedGraph.Main
         private Vertex? getVertexWithId(int id)
         {
             Vertex vertex = null;
-            foreach (Vertex v in adj_vertexes)
+            foreach (Vertex v in vertexes)
             {
                 if (v.id == id)
                         { vertex = v; }
@@ -98,7 +99,7 @@ namespace FedGraph.Main
         private int getVertexIdWithMinLength()
         {
             int minLength = int.MaxValue;
-            int id = 0;
+            int id = -1;
             foreach (KeyValuePair<int, Path> p in pathes)
             {   
                 if(p.Value.getMinLength() < minLength && !visited.Contains(p.Key))
@@ -119,25 +120,40 @@ namespace FedGraph.Main
             return mId;
         }
 
-        public async void dijksra(HttpClient client)
+        public async void dijksra(HttpClient client, Path recievedPath=null)
         {
-            /*
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:7052/api/graph/contains/12");
-            var response = client.Send(request);
-            Console.WriteLine(await response.Content.ReadAsStringAsync());
-            */
-            if (startVertexId != -1)
+            if (startVertexId != -1 && containsVertex(startVertexId))
             {
-                Console.WriteLine("Start");
+                Console.WriteLine($"Start {startVertexId}");
                 int startId = startVertexId;
-                Path startPath = new Path(getVertexWithId(startId), 0, null);
-                pathes.Add(startId, startPath);
+                Path startPath;
+                if (recievedPath != null)
+                    startPath = recievedPath;
+                else
+                    startPath = new Path(getVertexWithId(startId), 0, null);
+                if (pathes.ContainsKey(startId))
+                {
+                    if (pathes[startId].getMinLength() > recievedPath.getMinLength())
+                    {
+                        pathes[startId] = recievedPath;
+                    }
+                }
+                else
+                {
+                    pathes.Add(startId, startPath);
+                }
+                Console.WriteLine(startPath.min_length);
+                if (startPath.prev != null)
+                    Console.WriteLine($"id: {startPath.vertex.id}, len: {startPath.min_length}, prev: {startPath.prev.vertex.id}");
+                else
+                    Console.WriteLine($"id: {startPath.vertex.id}, len: {startPath.min_length}, prev: null");
                 while (visited.Count() != vertexesNum)
                 {
                     // Получаем вершину с минимальным путём до неё из непоесещённых
                     int vertexId = getVertexIdWithMinLength();
+                    // Алгоритм завершается, если больше нет путей
+                    if (vertexId == -1) { break; }
                     visited.Add(vertexId);
-                    // матричный id - число от 0 до vertexesNum - 1
 
                     // Ищем порядковый номер айдишника вершины
                     int mId = getVertexNum(vertexId);
@@ -145,7 +161,7 @@ namespace FedGraph.Main
                     for (int i = 0; i < vertexesNum; i++)
                     {
                         if (i != mId) 
-                        { 
+                        {
                             weight = matrix[mId, i];
                             if (weight > -1)
                             {
@@ -157,6 +173,7 @@ namespace FedGraph.Main
                                 {
                                     Path path = new Path(vertexes[i], weight + prevVertexLength, prevVertexPath);
                                     pathes.Add(vertexRealId, path);
+                                    Console.WriteLine($"id: {path.vertex.id}, len: {path.min_length}, prev: {path.prev.vertex.id}");
                                 }
                                 else
                                 {
@@ -165,6 +182,10 @@ namespace FedGraph.Main
                                     {
                                         path.setPrevious(prevVertexPath, weight);
                                     }
+                                    if (path.prev != null)
+                                        Console.WriteLine($"id: {path.vertex.id}, len: {path.min_length}, prev: {path.prev.vertex.id}");
+                                    else
+                                        Console.WriteLine($"id: {path.vertex.id}, len: {path.min_length}, prev: null");
                                 }
                             }
                         }
@@ -180,29 +201,19 @@ namespace FedGraph.Main
                                 var response = await client.SendAsync(request);
                                 if (await response.Content.ReadAsStringAsync() == "true")
                                 {
-                                    Console.WriteLine($"Server {s.id} {s.address} vertex {vertexId} true");
-                                }else
-                                {
-                                    Console.WriteLine($"Server {s.id} {s.address} vertex {vertexId} false");
+                                    // Отправляем на сервер сериализованный Path для граничащей вершины
+                                    JsonContent content = JsonContent.Create(pathes[vertexId]);
+                                    await client.PostAsync(s.address + "/api/graph/search/dijkstra", content);
                                 }
                             }
                         }
                     } catch (Exception e)
                     {
-
+                        Console.WriteLine(e.ToString());
                     }
+                    
                 }
                 Console.WriteLine("End");
-                /*
-                // Восстанавливаем путь
-                List<Path> restoredPath = restorePath(pathes[endId]);
-                // Выводим на экран
-                for (int i = restoredPath.Count() - 1; i >= 0; i--)
-                {
-                    Console.Write(restoredPath[i].vertex.id + " ");
-                }
-                Console.WriteLine();
-                */
             }
         }
 
@@ -213,7 +224,6 @@ namespace FedGraph.Main
             }
             return false;
         }
-
         public List<Path> getShortestPath()
         {
             List<Path> restoredPath = new List<Path>();
@@ -225,6 +235,7 @@ namespace FedGraph.Main
                 {
                     Console.Write(restoredPath[i].vertex.id + " ");
                 }
+                Console.Write(": " + restoredPath[0].min_length);
                 Console.WriteLine();
                 return restoredPath;
             }
