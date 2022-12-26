@@ -28,7 +28,7 @@ namespace FedGraph.Main
 
     public class Config
     {
-        public List<CVertex> vertexes { get; set; }
+        public List<Vertex> vertexes { get; set; }
         public List<CServer> servers { get; set; }
         public List<CAdjVertex> adj_list { get; set; }
     }

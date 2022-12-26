@@ -2,9 +2,14 @@ using FedGraph.Main;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// HttpClient для создания запросов из графа
+builder.Services.AddHttpClient();
+
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -24,12 +29,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-Config config = Parsing.parse();
-Graph graph = new Graph(config);
-graph.printMatrix();
-
-app.Run(async (context) => await context.Response.WriteAsync("Hello METANIT.COM"));
+//Создаём наш граф
+Application.graph = new Graph(Parsing.parse("config1.json"));
 
 app.Run();
 
+class Application
+{
+    public static Graph graph { get; set; }
+}
 
