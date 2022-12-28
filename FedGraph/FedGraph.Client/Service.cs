@@ -71,26 +71,39 @@ namespace FedGraph.Client
         }
         public static async Task<List<Path>> dijkstra(int startId, int endId)
         {
-            foreach (Server s in config.servers)
+            resetServers();
+            if (await searchIsDone())
             {
-                // Ищем сервер с содержащий указанную начальную вершину
-                if (await serverContainsVertex(s, startId)) 
+                foreach (Server s in config.servers)
                 {
-                    startSearch(s, startId);
+                    // Ищем сервер с содержащий указанную начальную вершину
+                    if (await serverContainsVertex(s, startId))
+                    {
+                        startSearch(s, startId);
+                    }
                 }
+                List<Path> path = null;
+                while (!await searchIsDone()) { }
+                foreach (Server s in config.servers)
+                {
+                    // Ищем сервер с содержащий указанную конечную вершину
+                    if (await serverContainsVertex(s, endId))
+                    {
+                        path = await getShortestPath(s, endId);
+                        break;
+                    }
+                }
+                return path;
             }
-            List<Path> path = null;
-            while (!await searchIsDone()) { }
-            foreach (Server s in config.servers)
+            return null;
+        }
+        public static void resetServers()
+        {
+            foreach(Server s in config.servers)
             {
-                // Ищем сервер с содержащий указанную начальную вершину
-                if (await serverContainsVertex(s, endId))
-                {
-                    path = await getShortestPath(s, endId);
-                    break;
-                }
+                var request = new HttpRequestMessage(HttpMethod.Get, s.address + "/api/graph/reset");
+                httpclient.Send(request);
             }
-            return path;
         }
     }
 }

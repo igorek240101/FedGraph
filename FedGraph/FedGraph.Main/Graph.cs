@@ -121,7 +121,7 @@ namespace FedGraph.Main
             }
             return id; 
         }
-
+        // Получить номер вершины
         private int getVertexNum(int id)
         {
             int mId;
@@ -129,6 +129,11 @@ namespace FedGraph.Main
                 if (vertexesIds[mId] == id)
                     break;
             return mId;
+        }
+        // Получить количество вершин
+        public int getVertexesNum()
+        {
+            return this.vertexesNum;
         }
 
         public async void dijksra(HttpClient client, Path recievedPath=null)
@@ -139,6 +144,7 @@ namespace FedGraph.Main
                 Console.WriteLine($"Start {startVertexId}");
                 int startId = startVertexId;
                 Path startPath;
+                /************** ОШИБКА ГДЕ_ТО ЗДЕСЬ **********************/
                 if (recievedPath != null)
                     startPath = recievedPath;
                 else
@@ -154,11 +160,11 @@ namespace FedGraph.Main
                 {
                     pathes.Add(startId, startPath);
                 }
-                Console.WriteLine(startPath.min_length);
+                /************** ОШИБКА ГДЕ_ТО ЗДЕСЬ **********************/
                 if (startPath.prev != null)
-                    Console.WriteLine($"id: {startPath.vertex.id}, len: {startPath.min_length}, prev: {startPath.prev.vertex.id}");
+                    Console.WriteLine($"startPath: id: {startPath.vertex.id}, len: {startPath.min_length}, prev: {startPath.prev.vertex.id}");
                 else
-                    Console.WriteLine($"id: {startPath.vertex.id}, len: {startPath.min_length}, prev: null");
+                    Console.WriteLine($"startPath: id: {startPath.vertex.id}, len: {startPath.min_length}, prev: null");
                 while (visited.Count() != vertexesNum)
                 {
                     // Получаем вершину с минимальным путём до неё из непоесещённых
@@ -203,10 +209,10 @@ namespace FedGraph.Main
                         }
                     }
                     // Если вершина граничащая
-                    try
-                    {
+                    //try
+                    //{
                         // Если вершина граничащая и при этом не является начальной, потому что в этом случае распараллеливаение производит клиент
-                        if (isAdjVertex(vertexId))
+                        if (isAdjVertex(vertexId) && vertexId != startVertexId)
                         {
                             foreach (CServer s in servers)
                             {
@@ -220,10 +226,10 @@ namespace FedGraph.Main
                                 }
                             }
                         }
-                    } catch (Exception e)
-                    {
-                        Console.WriteLine(e.ToString());
-                    }
+                    //} catch (Exception e)
+                    //{
+                    //    Console.WriteLine(e.ToString());
+                    //}
                     
                 }
                 Console.WriteLine("End");
@@ -270,6 +276,15 @@ namespace FedGraph.Main
             return entirePath;
         }
 
+        public void reset()
+        {
+            Console.WriteLine("RESET");
+            startVertexId = -1;
+            endVertexId = -1;
+            pathes.Clear();
+            visited.Clear();
+        }
+
         //debug
 #if DEBUG
         public void printMatrix()
@@ -292,9 +307,5 @@ namespace FedGraph.Main
             }
         }
 #endif
-        public int getVertexesNum() 
-        {
-            return this.vertexesNum;
-        }
     }
 }

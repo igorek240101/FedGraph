@@ -219,6 +219,7 @@
             // debug
             // 
             this.debug.AutoSize = true;
+            this.debug.ForeColor = System.Drawing.Color.Crimson;
             this.debug.Location = new System.Drawing.Point(380, 51);
             this.debug.Name = "debug";
             this.debug.Size = new System.Drawing.Size(0, 20);

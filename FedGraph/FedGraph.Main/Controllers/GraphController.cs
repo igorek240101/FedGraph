@@ -57,6 +57,11 @@
         {
             return new JsonResult(Application.graph.isInProgress());
         }
+        [HttpGet("reset")]
+        public void GetResetGraph()
+        {
+            Application.graph.reset();
+        }
         [HttpPost("search/dijkstra")]
         public JsonResult PostTransitionToAdjVertex([FromBody] Path path)
         {

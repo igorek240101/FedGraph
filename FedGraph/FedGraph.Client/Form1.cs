@@ -76,23 +76,40 @@ namespace FedGraph.Client
             if (valuesIsValid(startNodeValue, endNodeValue)) {
                 int startVertexId = int.Parse(startNodeValue);
                 int endVertexId = int.Parse(endNodeValue);
-
-                // Запускаем алгоритм поиска кратчайшего пути
-                List<Path> shortestPath = await Service.dijkstra(startVertexId, endVertexId);
-                pathLengthLabel.Text = shortestPath[0].min_length.ToString();
-                string pathStr = "";
-                for(int i = shortestPath.Count()-1; i >= 0; i--)
+                try
                 {
-                    pathStr = pathStr + shortestPath[i].vertex.id.ToString() + " ";
+                    // Запускаем алгоритм поиска кратчайшего пути
+                    List<Path> shortestPath = await Service.dijkstra(startVertexId, endVertexId);
+                    if (shortestPath != null)
+                    {
+                        pathLengthLabel.Text = shortestPath[0].min_length.ToString();
+                        string pathStr = "";
+                        for (int i = shortestPath.Count() - 1; i >= 0; i--)
+                        {
+                            pathStr = pathStr + shortestPath[i].vertex.id.ToString() + " ";
+                        }
+                        shortestPathLabel.Text = pathStr;
+                    }
+                }catch (System.Net.Http.HttpRequestException exception)
+                {
+                    debug.Text = "Ошибка подключения";
                 }
-                shortestPathLabel.Text = pathStr;
             }
         }
 
         private async void Form1_Load(object sender, EventArgs e)
         {
             Service.Initialize();
-            nodesNumLabel.Text = Service.getVertexesNum().Result.ToString();
+            try
+            {
+                nodesNumLabel.Text = Service.getVertexesNum().Result.ToString();
+            }
+            catch (System.AggregateException exception)
+            {
+                nodesNumLabel.Text = "N";
+                debug.Text = "Ошибка подключения";
+                
+            }
         }
 
         private void label8_Click(object sender, EventArgs e)
