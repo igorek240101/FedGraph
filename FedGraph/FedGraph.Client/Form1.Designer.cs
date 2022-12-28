@@ -47,6 +47,7 @@
             this.справкаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startNodeInvalidLabel = new System.Windows.Forms.Label();
             this.endNodeInvalidLabel = new System.Windows.Forms.Label();
+            this.debug = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -153,6 +154,7 @@
             this.pathLengthLabel.Name = "pathLengthLabel";
             this.pathLengthLabel.Size = new System.Drawing.Size(0, 20);
             this.pathLengthLabel.TabIndex = 11;
+            this.pathLengthLabel.Click += new System.EventHandler(this.pathLengthLabel_Click);
             // 
             // shortestPathLabel
             // 
@@ -214,11 +216,22 @@
             this.endNodeInvalidLabel.Size = new System.Drawing.Size(0, 20);
             this.endNodeInvalidLabel.TabIndex = 16;
             // 
+            // debug
+            // 
+            this.debug.AutoSize = true;
+            this.debug.ForeColor = System.Drawing.Color.Crimson;
+            this.debug.Location = new System.Drawing.Point(380, 51);
+            this.debug.Name = "debug";
+            this.debug.Size = new System.Drawing.Size(0, 20);
+            this.debug.TabIndex = 17;
+            this.debug.Click += new System.EventHandler(this.label8_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 491);
+            this.Controls.Add(this.debug);
             this.Controls.Add(this.endNodeInvalidLabel);
             this.Controls.Add(this.startNodeInvalidLabel);
             this.Controls.Add(this.saveResultBtn);
@@ -239,6 +252,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -266,5 +280,6 @@
         private ToolStripMenuItem справкаToolStripMenuItem;
         private Label startNodeInvalidLabel;
         private Label endNodeInvalidLabel;
+        private Label debug;
     }
 }
