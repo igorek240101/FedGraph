@@ -70,7 +70,6 @@
             else
                 Console.WriteLine($"Recieved path: {path.vertex.id} len: {path.min_length} prev: null");
             var client = clientFactory.CreateClient();
-            Application.graph.setStartVertexId(path.vertex.id);
             Application.graph.dijksra(client, path);
             return new JsonResult(true);
         }
