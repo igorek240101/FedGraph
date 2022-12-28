@@ -105,5 +105,17 @@ namespace FedGraph.Client
                 httpclient.Send(request);
             }
         }
+
+        public static void savePath(string startId, string endId, string length, string path, string filename)
+        {
+            using (StreamWriter writer = new StreamWriter(filename, false))
+            {
+                string str = $"Начальная вершина: {startId}\n" +
+                    $"Конечная вершина: {endId}\n" +
+                    $"Длина пути: {length}\n" +
+                    $"Кратчайший путь: {path}";
+                writer.WriteLine(str);
+            }
+        }
     }
 }

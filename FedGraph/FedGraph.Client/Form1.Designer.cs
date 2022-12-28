@@ -48,7 +48,9 @@
             this.startNodeInvalidLabel = new System.Windows.Forms.Label();
             this.endNodeInvalidLabel = new System.Windows.Forms.Label();
             this.debug = new System.Windows.Forms.Label();
+            this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -72,7 +74,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(51, 174);
+            this.label3.Location = new System.Drawing.Point(50, 158);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(147, 20);
             this.label3.TabIndex = 2;
@@ -132,14 +134,14 @@
             // 
             // endNodeTextBox
             // 
-            this.endNodeTextBox.Location = new System.Drawing.Point(229, 167);
+            this.endNodeTextBox.Location = new System.Drawing.Point(228, 151);
             this.endNodeTextBox.Name = "endNodeTextBox";
             this.endNodeTextBox.Size = new System.Drawing.Size(56, 27);
             this.endNodeTextBox.TabIndex = 9;
             // 
             // findPathBtn
             // 
-            this.findPathBtn.Location = new System.Drawing.Point(51, 230);
+            this.findPathBtn.Location = new System.Drawing.Point(49, 215);
             this.findPathBtn.Name = "findPathBtn";
             this.findPathBtn.Size = new System.Drawing.Size(235, 40);
             this.findPathBtn.TabIndex = 10;
@@ -173,6 +175,7 @@
             this.saveResultBtn.TabIndex = 13;
             this.saveResultBtn.Text = "Сохранить результат";
             this.saveResultBtn.UseVisualStyleBackColor = true;
+            this.saveResultBtn.Click += new System.EventHandler(this.saveResultBtn_Click);
             // 
             // menuStrip1
             // 
@@ -197,6 +200,7 @@
             this.справкаToolStripMenuItem.Name = "справкаToolStripMenuItem";
             this.справкаToolStripMenuItem.Size = new System.Drawing.Size(81, 24);
             this.справкаToolStripMenuItem.Text = "Справка";
+            this.справкаToolStripMenuItem.Click += new System.EventHandler(this.справкаToolStripMenuItem_Click);
             // 
             // startNodeInvalidLabel
             // 
@@ -211,7 +215,7 @@
             // 
             this.endNodeInvalidLabel.AutoSize = true;
             this.endNodeInvalidLabel.ForeColor = System.Drawing.Color.Red;
-            this.endNodeInvalidLabel.Location = new System.Drawing.Point(51, 197);
+            this.endNodeInvalidLabel.Location = new System.Drawing.Point(50, 181);
             this.endNodeInvalidLabel.Name = "endNodeInvalidLabel";
             this.endNodeInvalidLabel.Size = new System.Drawing.Size(0, 20);
             this.endNodeInvalidLabel.TabIndex = 16;
@@ -225,6 +229,11 @@
             this.debug.Size = new System.Drawing.Size(0, 20);
             this.debug.TabIndex = 17;
             this.debug.Click += new System.EventHandler(this.label8_Click);
+            // 
+            // fileSystemWatcher1
+            // 
+            this.fileSystemWatcher1.EnableRaisingEvents = true;
+            this.fileSystemWatcher1.SynchronizingObject = this;
             // 
             // Form1
             // 
@@ -255,6 +264,7 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -281,5 +291,6 @@
         private Label startNodeInvalidLabel;
         private Label endNodeInvalidLabel;
         private Label debug;
+        private FileSystemWatcher fileSystemWatcher1;
     }
 }
