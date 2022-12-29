@@ -57,11 +57,6 @@ namespace FedGraph.Main
             return adj_vertexes;
         }
 
-        public int getEdgeWeight(int v1, int v2)
-        {
-            return this.matrix[v1, v2];
-        }
-
         public void setStartVertexId(int id)
         {
             startVertexId = id;
