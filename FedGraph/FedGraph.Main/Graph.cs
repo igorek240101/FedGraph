@@ -20,8 +20,9 @@ namespace FedGraph.Main
         private int startVertexId;
         private int endVertexId;
 
+        private bool inProgress;
         private int[] vertexesIds; // проиндексированные айдишники вершин
-
+        
         public Graph(Config config)
         {
             this.vertexesNum = config.vertexes.Count();
@@ -46,6 +47,16 @@ namespace FedGraph.Main
             }
             fillMatrix(config);
         }
+        public int getEdgeWeight(int v1, int v2)
+        {
+            return this.matrix[v1, v2];
+        }
+
+        public List<Vertex> getAdjVertexes()
+        {
+            return adj_vertexes;
+        }
+
         public int getEdgeWeight(int v1, int v2)
         {
             return this.matrix[v1, v2];
@@ -114,7 +125,7 @@ namespace FedGraph.Main
             }
             return id; 
         }
-
+        // Получить номер вершины
         private int getVertexNum(int id)
         {
             int mId;
@@ -123,104 +134,116 @@ namespace FedGraph.Main
                     break;
             return mId;
         }
+        // Получить количество вершин
+        public int getVertexesNum()
+        {
+            return this.vertexesNum;
+        }
 
         public async void dijksra(HttpClient client, Path recievedPath=null)
         {
-            if (startVertexId != -1 && containsVertex(startVertexId))
+            inProgress = true;
+            int startId = -1;
+            Path startPath;
+            if (recievedPath != null)
             {
-                Console.WriteLine($"Start {startVertexId}");
-                int startId = startVertexId;
-                Path startPath;
-                if (recievedPath != null)
-                    startPath = recievedPath;
-                else
-                    startPath = new Path(getVertexWithId(startId), 0, null);
-                if (pathes.ContainsKey(startId))
+                startId = recievedPath.vertex.id;
+                startPath = recievedPath;
+            }
+            else
+            {
+                startId = startVertexId;
+                startPath = new Path(getVertexWithId(startId), 0, null);
+            }
+            Console.WriteLine($"Start {startId}");
+            if (pathes.ContainsKey(startId))
+            {
+                if (pathes[startId].getMinLength() > recievedPath.getMinLength())
                 {
-                    if (pathes[startId].getMinLength() > recievedPath.getMinLength())
-                    {
-                        pathes[startId] = recievedPath;
-                    }
+                    pathes[startId] = recievedPath;
                 }
-                else
-                {
-                    pathes.Add(startId, startPath);
-                }
-                Console.WriteLine(startPath.min_length);
-                if (startPath.prev != null)
-                    Console.WriteLine($"id: {startPath.vertex.id}, len: {startPath.min_length}, prev: {startPath.prev.vertex.id}");
-                else
-                    Console.WriteLine($"id: {startPath.vertex.id}, len: {startPath.min_length}, prev: null");
-                while (visited.Count() != vertexesNum)
-                {
-                    // Получаем вершину с минимальным путём до неё из непоесещённых
-                    int vertexId = getVertexIdWithMinLength();
-                    // Алгоритм завершается, если больше нет путей
-                    if (vertexId == -1) { break; }
-                    visited.Add(vertexId);
+            }
+            else
+            {
+                pathes.Add(startId, startPath);
+            }
 
-                    // Ищем порядковый номер айдишника вершины
-                    int mId = getVertexNum(vertexId);
-                    int weight;
-                    for (int i = 0; i < vertexesNum; i++)
+            if (startPath.prev != null)
+                Console.WriteLine($"startPath: id: {startPath.vertex.id}, len: {startPath.min_length}, prev: {startPath.prev.vertex.id}");
+            else
+                Console.WriteLine($"startPath: id: {startPath.vertex.id}, len: {startPath.min_length}, prev: null");
+            while (visited.Count() != vertexesNum)
+            {
+                // Получаем вершину с минимальным путём до неё из непоесещённых
+                int vertexId = getVertexIdWithMinLength();
+                // Алгоритм завершается, если больше нет путей
+                if (vertexId == -1) { break; }
+                visited.Add(vertexId);
+
+                // Ищем порядковый номер айдишника вершины
+                int mId = getVertexNum(vertexId);
+                int weight;
+                for (int i = 0; i < vertexesNum; i++)
+                {
+                    if (i != mId) 
                     {
-                        if (i != mId) 
+                        weight = matrix[mId, i];
+                        if (weight > -1)
                         {
-                            weight = matrix[mId, i];
-                            if (weight > -1)
+                            // реальный id - id из конфига
+                            int vertexRealId = vertexesIds[i];
+                            Path prevVertexPath = pathes[vertexId];
+                            int prevVertexLength = prevVertexPath.getMinLength();
+                            if (!pathes.ContainsKey(vertexRealId))
                             {
-                                // реальный id - id из конфига
-                                int vertexRealId = vertexesIds[i];
-                                Path prevVertexPath = pathes[vertexId];
-                                int prevVertexLength = prevVertexPath.getMinLength();
-                                if (!pathes.ContainsKey(vertexRealId))
+                                Path path = new Path(vertexes[i], weight + prevVertexLength, prevVertexPath);
+                                pathes.Add(vertexRealId, path);                            }
+                            else
+                            {
+                                Path path = pathes[vertexRealId];
+                                if (path.getMinLength() > weight + prevVertexLength)
                                 {
-                                    Path path = new Path(vertexes[i], weight + prevVertexLength, prevVertexPath);
-                                    pathes.Add(vertexRealId, path);
-                                    Console.WriteLine($"id: {path.vertex.id}, len: {path.min_length}, prev: {path.prev.vertex.id}");
-                                }
-                                else
-                                {
-                                    Path path = pathes[vertexRealId];
-                                    if (path.getMinLength() > weight + prevVertexLength)
-                                    {
-                                        path.setPrevious(prevVertexPath, weight);
-                                    }
-                                    if (path.prev != null)
-                                        Console.WriteLine($"id: {path.vertex.id}, len: {path.min_length}, prev: {path.prev.vertex.id}");
-                                    else
-                                        Console.WriteLine($"id: {path.vertex.id}, len: {path.min_length}, prev: null");
+                                    path.setPrevious(prevVertexPath, weight);
                                 }
                             }
                         }
                     }
-                    // Если вершина граничащая
-                    try
+                }
+                // Если вершина граничащая и при этом не является начальной, потому что в этом случае распараллеливаение производит клиент
+                Console.WriteLine("PATHES: ");
+                try
+                {
+                    foreach (KeyValuePair<int, Path> pair in pathes)
                     {
-                        if (isAdjVertex(vertexId))
-                        {
-                            foreach (CServer s in servers)
-                            {
-                                var request = new HttpRequestMessage(HttpMethod.Get, s.address + $"/api/graph/contains/{vertexId}");
-                                var response = await client.SendAsync(request);
-                                if (await response.Content.ReadAsStringAsync() == "true")
-                                {
-                                    // Отправляем на сервер сериализованный Path для граничащей вершины
-                                    JsonContent content = JsonContent.Create(pathes[vertexId]);
-                                    await client.PostAsync(s.address + "/api/graph/search/dijkstra", content);
-                                }
-                            }
-                        }
-                    } catch (Exception e)
-                    {
-                        Console.WriteLine(e.ToString());
+                        if (pair.Value.prev != null)
+                            Console.WriteLine($"VertexId: {pair.Key} - Path: id: {pair.Value.vertex.id} minlen: {pair.Value.min_length} prev: {pair.Value.prev.vertex.id}");
+                        else
+                            Console.WriteLine($"VertexId: {pair.Key} - Path: id: {pair.Value.vertex.id} minlen: {pair.Value.min_length} prev: null");
                     }
-                    
+                }
+                catch (System.InvalidOperationException excep) { }
+                if (isAdjVertex(vertexId) && vertexId != startVertexId)
+                {
+                    foreach (CServer s in servers)
+                    {
+                        var request = new HttpRequestMessage(HttpMethod.Get, s.address + $"/api/graph/contains/{vertexId}");
+                        var response = await client.SendAsync(request);
+                        if (await response.Content.ReadAsStringAsync() == "true")
+                        {
+                            // Отправляем на сервер сериализованный Path для граничащей вершины
+                            JsonContent content = JsonContent.Create(pathes[vertexId]);
+                            await client.PostAsync(s.address + "/api/graph/search/dijkstra", content);
+                        }
+                    }
                 }
                 Console.WriteLine("End");
             }
+            inProgress = false;
         }
-
+        public bool isInProgress()
+        {
+            return inProgress;
+        }
         public bool isAdjVertex(int vertexId)
         {
             foreach (Vertex v in adj_vertexes) {
@@ -257,6 +280,15 @@ namespace FedGraph.Main
             return entirePath;
         }
 
+        public void reset()
+        {
+            Console.WriteLine("RESET");
+            startVertexId = -1;
+            endVertexId = -1;
+            pathes.Clear();
+            visited.Clear();
+        }
+
         //debug
 #if DEBUG
         public void printMatrix()
@@ -271,17 +303,6 @@ namespace FedGraph.Main
                 Console.WriteLine();
             }
         }
-        public void printPathes()
-        {
-            foreach(KeyValuePair<int, Path> p in pathes)
-            {
-                Console.WriteLine(p.Key + ": " + p.Value.getMinLength());
-            }
-        }
 #endif
-        public int getVertexesNum() 
-        {
-            return this.vertexesNum;
-        }
     }
 }
