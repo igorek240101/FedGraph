@@ -89,6 +89,11 @@ namespace FedGraph.Client
                             pathStr = pathStr + shortestPath[i].vertex.id.ToString() + " ";
                         }
                         shortestPathLabel.Text = pathStr;
+                        debug.Text = "";
+                    }
+                    else
+                    {
+                        debug.Text = "Нет кратчайшего пути";
                     }
                 }catch (System.Net.Http.HttpRequestException exception)
                 {
