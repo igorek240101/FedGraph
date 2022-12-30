@@ -58,8 +58,14 @@ namespace FedGraph.Client
             var request = new HttpRequestMessage(HttpMethod.Get, s.address + $"/api/graph/search/end/{vertexId}");
             var response = httpclient.Send(request);
             string jsonString = await response.Content.ReadAsStringAsync();
-            var path = JsonConvert.DeserializeObject<List<Path>>(jsonString);
-            return path;
+            try
+            {
+                var path = JsonConvert.DeserializeObject<List<Path>>(jsonString);
+                return path;
+            } catch(Newtonsoft.Json.JsonReaderException exception)
+            {
+                return null;
+            }
         }
         public static async Task<bool> searchIsDone()
         {
