@@ -1,0 +1,124 @@
+{
+  "vertexes": [
+    {
+      "id": 1,
+      "info": "",
+      "adj_vertices": []
+    },
+    {
+      "id": 2,
+      "info": "",
+      "adj_vertices": []
+    },
+    {
+      "id": 3,
+      "info": "",
+      "adj_vertices": []
+    },
+    {
+      "id": 4,
+      "info": "",
+      "adj_vertices": []
+    },
+    {
+      "id": 5,
+      "info": "",
+      "adj_vertices": [7]
+    },
+    {
+      "id": 6,
+      "info": "",
+      "adj_vertices": [8]
+    }
+  ],
+  "servers": [
+    {
+      "id": 2,
+      "address": "https://localhost:5002"
+    },
+    {
+      "id": 3,
+      "address": "https://localhost:5003"
+    }
+  ],
+  "adj_list": [
+    {
+      "id": 1,
+      "edges": [
+        {
+          "id": 2,
+          "weight": 8
+        },
+        {
+          "id": 3,
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "edges": [
+        {
+          "id": 1,
+          "weight": 8
+        },
+        {
+          "id": 3,
+          "weight": 11
+        },
+        {
+          "id": 5,
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "edges": [
+        {
+          "id": 1,
+          "weight": 2
+        },
+        {
+          "id": 2,
+          "weight": 11
+        },
+        {
+          "id": 6,
+          "weight": 4
+        },
+        {
+          "id": 4,
+          "weight": 15
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "edges": [
+        {
+          "id": 3,
+          "weight": 15
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "edges": [
+        {
+          "id": 2,
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "edges": [
+        {
+          "id": 3,
+          "weight": 4
+        }
+      ]
+    }
+  ]
+}
