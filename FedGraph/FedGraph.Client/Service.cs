@@ -62,7 +62,8 @@ namespace FedGraph.Client
             {
                 var path = JsonConvert.DeserializeObject<List<Path>>(jsonString);
                 return path;
-            } catch(Newtonsoft.Json.JsonReaderException exception)
+            }
+            catch (Newtonsoft.Json.JsonReaderException exception)
             {
                 return null;
             }
@@ -75,37 +76,71 @@ namespace FedGraph.Client
             }
             return true;
         }
-        public static async Task<List<Path>> dijkstra(int startId, int endId)
+        private static bool getSearchIsDone()
+        {
+            var task = searchIsDone();
+            task.Wait();
+            var result = task.Result;
+            return result;
+        }
+
+        private static bool getServerContainsVertex(Server s, int id)
+        {
+            var task = serverContainsVertex(s, id);
+            task.Wait();
+            var result = task.Result;
+            return result;
+        }
+        private static List<Path> getGetShortestPath(Server s, int endId)
+        {
+            var task = getShortestPath(s, endId);
+            task.Wait();
+            var result = task.Result;
+            return result;
+        }
+        public static List<Path> dijkstra(int startId, int endId)
         {
             resetServers();
-            if (await searchIsDone())
+            if (getSearchIsDone())
             {
                 foreach (Server s in config.servers)
                 {
                     // Ищем сервер с содержащий указанную начальную вершину
-                    if (await serverContainsVertex(s, startId))
+                    if (getServerContainsVertex(s, startId))
                     {
                         startSearch(s, startId);
                     }
                 }
+                
                 List<Path> path = null;
-                while (!await searchIsDone()) { }
+                List<Path> shortPath = null;
+                while (!getSearchIsDone()) { }
                 foreach (Server s in config.servers)
                 {
                     // Ищем сервер с содержащий указанную конечную вершину
-                    if (await serverContainsVertex(s, endId))
+                    while (!getSearchIsDone()) { }
+                    if (getServerContainsVertex(s, endId))
                     {
-                        path = await getShortestPath(s, endId);
-                        break;
+                        path = getGetShortestPath(s, endId);
+                        if (shortPath != null)
+                        {
+                            if (path[0].min_length < shortPath[0].min_length)
+                            {
+                                shortPath = path;
+                            }
+                        }else
+                        {
+                            shortPath = path;
+                        }
                     }
                 }
-                return path;
+                return shortPath;
             }
             return null;
         }
         public static void resetServers()
         {
-            foreach(Server s in config.servers)
+            foreach (Server s in config.servers)
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, s.address + "/api/graph/reset");
                 httpclient.Send(request);

@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using System.Security.Cryptography.X509Certificates;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -48,9 +49,13 @@
         [HttpGet("search/end/{id}")]
         public JsonResult GetEndSearch(int id)
         {
-            Application.graph.setEndVertexId(id);
-            List<Path> path = Application.graph.getShortestPath();
-            return new JsonResult(path);
+            if (Application.graph.containsVertex(id))
+            {
+                Application.graph.setEndVertexId(id);
+                List<Path> path = Application.graph.getShortestPath();
+                return new JsonResult(path);
+            }
+            return new JsonResult(null);
         }
         [HttpGet("search/progress")]
         public JsonResult GetSearchInProgress()

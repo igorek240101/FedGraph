@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
@@ -22,7 +23,8 @@ namespace FedGraph.Main
 
         private bool inProgress;
         private int[] vertexesIds; // проиндексированные айдишники вершин
-        
+        private List<int> visitedAdjVertices;
+
         public Graph(Config config)
         {
             this.vertexesNum = config.vertexes.Count();
@@ -35,6 +37,7 @@ namespace FedGraph.Main
             this.endVertexId = -1;
             this.vertexesIds = new int[vertexesNum];
             this.servers = config.servers;
+            this.visitedAdjVertices = new List<int>();
             Console.WriteLine("vertexesNum: " + vertexesNum);
 
             for (int i = 0; i < vertexesNum; i++)
@@ -111,12 +114,17 @@ namespace FedGraph.Main
             int minLength = int.MaxValue;
             int id = -1;
             foreach (KeyValuePair<int, Path> p in pathes)
-            {   
-                if(p.Value.getMinLength() < minLength && !visited.Contains(p.Key))
+            {
+                try
                 {
-                    minLength = p.Value.getMinLength();
-                    id = p.Key;
+                    if (p.Value.getMinLength() < minLength
+                        && !visited.Contains(p.Key))
+                    {
+                        minLength = p.Value.getMinLength();
+                        id = p.Key;
+                    }
                 }
+                catch (System.NullReferenceException e) { }
             }
             return id; 
         }
@@ -153,10 +161,16 @@ namespace FedGraph.Main
             Console.WriteLine($"Start {startId}");
             if (pathes.ContainsKey(startId))
             {
-                if (pathes[startId].getMinLength() > recievedPath.getMinLength())
+                try
                 {
-                    pathes[startId] = recievedPath;
+                    if (pathes[startId].getMinLength() > recievedPath.getMinLength())
+                    {
+                        pathes[startId] = recievedPath;
+                        visited.Clear();
+                    }
                 }
+                catch (System.NullReferenceException e) { }
+                //путь до граничащей вершины изменился, поэтому нужно пересмотреть все смежные с ней вершины
             }
             else
             {
@@ -167,72 +181,98 @@ namespace FedGraph.Main
                 Console.WriteLine($"startPath: id: {startPath.vertex.id}, len: {startPath.min_length}, prev: {startPath.prev.vertex.id}");
             else
                 Console.WriteLine($"startPath: id: {startPath.vertex.id}, len: {startPath.min_length}, prev: null");
-            while (visited.Count() != vertexesNum)
-            {
-                // Получаем вершину с минимальным путём до неё из непоесещённых
-                int vertexId = getVertexIdWithMinLength();
-                // Алгоритм завершается, если больше нет путей
-                if (vertexId == -1) { break; }
-                visited.Add(vertexId);
 
-                // Ищем порядковый номер айдишника вершины
-                int mId = getVertexNum(vertexId);
-                int weight;
-                for (int i = 0; i < vertexesNum; i++)
+                while (visited.Count() != vertexesNum)
                 {
-                    if (i != mId) 
+                    
+                    // Получаем вершину с минимальным путём до неё из непоесещённых
+                    int vertexId = getVertexIdWithMinLength();
+                    // Алгоритм завершается, если больше нет путей
+                    if (vertexId == -1) { break; }
+                    //помечаем вершину как посещенную
+                    visited.Add(vertexId);
+                    
+                    if (isAdjVertex(vertexId))
                     {
-                        weight = matrix[mId, i];
-                        if (weight > -1)
-                        {
-                            // реальный id - id из конфига
-                            int vertexRealId = vertexesIds[i];
-                            Path prevVertexPath = pathes[vertexId];
-                            int prevVertexLength = prevVertexPath.getMinLength();
-                            if (!pathes.ContainsKey(vertexRealId))
+                        visitedAdjVertices.Add(vertexId);
+                    }
+                    
+                    // Ищем порядковый номер айдишника вершины
+                    int mId = getVertexNum(vertexId);
+                    int weight;
+                    {
+                        for (int i = 0; i < vertexesNum; i++)
+                            if (i != mId)
                             {
-                                Path path = new Path(vertexes[i], weight + prevVertexLength, prevVertexPath);
-                                pathes.Add(vertexRealId, path);                            }
-                            else
-                            {
-                                Path path = pathes[vertexRealId];
-                                if (path.getMinLength() > weight + prevVertexLength)
+                                weight = matrix[mId, i];
+                                if (weight > -1)
                                 {
-                                    path.setPrevious(prevVertexPath, weight);
+                                    // реальный id - id из конфига
+                                    int vertexRealId = vertexesIds[i];
+                                    Path prevVertexPath = pathes[vertexId];
+                                    int prevVertexLength = prevVertexPath.getMinLength();
+                                    if (!pathes.ContainsKey(vertexRealId))
+                                    {
+                                        Path path = new Path(vertexes[i], weight + prevVertexLength, prevVertexPath);
+                                        pathes.Add(vertexRealId, path);
+                                    }
+                                    else
+                                    {
+                                        Path path = pathes[vertexRealId];
+                                        if (path.getMinLength() > weight + prevVertexLength)
+                                        {
+                                            path.setPrevious(prevVertexPath, weight);
+                                        }
+                                    }
                                 }
+                            }
+                    }
+                    Console.WriteLine("PATHES: ");
+                    try
+                    {
+                        foreach (KeyValuePair<int, Path> pair in pathes)
+                        {
+                            if (pair.Value.prev != null)
+                                Console.WriteLine($"VertexId: {pair.Key} - Path: id: {pair.Value.vertex.id} minlen: {pair.Value.min_length} prev: {pair.Value.prev.vertex.id}");
+                            else
+                                Console.WriteLine($"VertexId: {pair.Key} - Path: id: {pair.Value.vertex.id} minlen: {pair.Value.min_length} prev: null");
+                        }
+                    }
+                    catch (System.InvalidOperationException excep) { }
+                    // Если вершина граничащая и при этом не является начальной, потому что в этом случае распараллеливаение производит клиент
+                    if (isAdjVertex(vertexId) && vertexId != startVertexId)
+                    {
+                        foreach (CServer s in servers)
+                        {
+                            var request = new HttpRequestMessage(HttpMethod.Get, s.address + $"/api/graph/contains/{vertexId}");
+                            var response = await client.SendAsync(request);
+                            if (await response.Content.ReadAsStringAsync() == "true")
+                            {
+                                // Отправляем на сервер сериализованный Path для граничащей вершины
+                                JsonContent content = JsonContent.Create(pathes[vertexId]);
+                                Console.WriteLine($"Sent path: {pathes[vertexId].vertex.id} len: {pathes[vertexId].min_length} prev: {pathes[vertexId].prev}");
+                                await client.PostAsync(s.address + "/api/graph/search/dijkstra", content);
                             }
                         }
                     }
                 }
-                // Если вершина граничащая и при этом не является начальной, потому что в этом случае распараллеливаение производит клиент
-                Console.WriteLine("PATHES: ");
-                try
+            
+            Console.WriteLine("End");
+            Console.WriteLine("ENDPATHES: ");
+            try
+            {
+                foreach (KeyValuePair<int, Path> pair in pathes)
                 {
-                    foreach (KeyValuePair<int, Path> pair in pathes)
-                    {
-                        if (pair.Value.prev != null)
-                            Console.WriteLine($"VertexId: {pair.Key} - Path: id: {pair.Value.vertex.id} minlen: {pair.Value.min_length} prev: {pair.Value.prev.vertex.id}");
-                        else
-                            Console.WriteLine($"VertexId: {pair.Key} - Path: id: {pair.Value.vertex.id} minlen: {pair.Value.min_length} prev: null");
-                    }
+                    if (pair.Value.prev != null)
+                        Console.WriteLine($"VertexId: {pair.Key} - Path: id: {pair.Value.vertex.id} minlen: {pair.Value.min_length} prev: {pair.Value.prev.vertex.id}");
+                    else
+                        Console.WriteLine($"VertexId: {pair.Key} - Path: id: {pair.Value.vertex.id} minlen: {pair.Value.min_length} prev: null");
                 }
-                catch (System.InvalidOperationException excep) { }
-                if (isAdjVertex(vertexId) && vertexId != startVertexId)
-                {
-                    foreach (CServer s in servers)
-                    {
-                        var request = new HttpRequestMessage(HttpMethod.Get, s.address + $"/api/graph/contains/{vertexId}");
-                        var response = await client.SendAsync(request);
-                        if (await response.Content.ReadAsStringAsync() == "true")
-                        {
-                            // Отправляем на сервер сериализованный Path для граничащей вершины
-                            JsonContent content = JsonContent.Create(pathes[vertexId]);
-                            await client.PostAsync(s.address + "/api/graph/search/dijkstra", content);
-                        }
-                    }
-                }
-                Console.WriteLine("End");
             }
+            catch (System.InvalidOperationException excep) { }
+            
+            Console.WriteLine($"len: {visitedAdjVertices.Count()}");
+            
             inProgress = false;
         }
         public bool isInProgress()
@@ -279,9 +319,11 @@ namespace FedGraph.Main
         {
             Console.WriteLine("RESET");
             startVertexId = -1;
+            inProgress = false;
             endVertexId = -1;
             pathes.Clear();
             visited.Clear();
+            visitedAdjVertices.Clear();
         }
 
         //debug

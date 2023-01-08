@@ -69,7 +69,7 @@ namespace FedGraph.Client
             return isValid;
         }
 
-        private async void findPathBtn_Click(object sender, EventArgs e)
+        private void findPathBtn_Click(object sender, EventArgs e)
         {
             string startNodeValue = this.startNodeTextBox.Text;
             string endNodeValue = this.endNodeTextBox.Text;
@@ -79,7 +79,7 @@ namespace FedGraph.Client
                 try
                 {
                     // Запускаем алгоритм поиска кратчайшего пути
-                    List<Path> shortestPath = await Service.dijkstra(startVertexId, endVertexId);
+                    List<Path> shortestPath = Service.dijkstra(startVertexId, endVertexId);
                     if (shortestPath != null)
                     {
                         pathLengthLabel.Text = shortestPath[0].min_length.ToString();
