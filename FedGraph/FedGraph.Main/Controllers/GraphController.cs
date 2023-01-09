@@ -45,7 +45,7 @@
                 Application.graph.dijksra(client);
             }
         }
-        // Устанавливаем конечную вершину для алгоритма Дейкстры
+        // Возвращает кратчайший путь до вершины с id
         [HttpGet("search/end/{id}")]
         public JsonResult GetEndSearch(int id)
         {
@@ -67,13 +67,15 @@
         {
             Application.graph.reset();
         }
+        // Запускает алгориртм Дейкстры с граничащей вершины вместе с Path, полученным с другого сервера 
         [HttpPost("search/dijkstra")]
         public JsonResult PostTransitionToAdjVertex([FromBody] Path path)
-        {
+        {   
+            /*
             if (path.prev != null)
                 Console.WriteLine($"Recieved path: {path.vertex.id} len: {path.min_length} prev: {path.prev.vertex.id}");
             else
-                Console.WriteLine($"Recieved path: {path.vertex.id} len: {path.min_length} prev: null");
+                Console.WriteLine($"Recieved path: {path.vertex.id} len: {path.min_length} prev: null");*/
             var client = clientFactory.CreateClient();
             Application.graph.dijksra(client, path);
             return new JsonResult(true);

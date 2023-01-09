@@ -30,10 +30,12 @@ app.UseAuthorization();
 app.MapControllers();
 
 //Создаём наш граф
-Application.graph = new Graph(Parsing.parse("config1.json"));
+Application.graph = new Graph(Parsing.parse("config.json"));
 
+// Запуск сервера
 app.Run();
 
+// Обёртка над объектом класса граф,чтобы он создавался только при запуске сервера, а не при каждом запросе к нему
 class Application
 {
     public static Graph graph { get; set; }

@@ -69,34 +69,42 @@ namespace FedGraph.Client
             return isValid;
         }
 
+        //Обработчик события нажатия для кнопки поиска пути
         private void findPathBtn_Click(object sender, EventArgs e)
         {
             string startNodeValue = this.startNodeTextBox.Text;
             string endNodeValue = this.endNodeTextBox.Text;
+            // Проверяем поля на правильность ввода
             if (valuesIsValid(startNodeValue, endNodeValue)) {
                 int startVertexId = int.Parse(startNodeValue);
                 int endVertexId = int.Parse(endNodeValue);
                 try
                 {
-                    // Запускаем алгоритм поиска кратчайшего пути
+                    // Выполняем поиск кратчайшего пути. Он возвращется как список из путей
                     List<Path> shortestPath = Service.dijkstra(startVertexId, endVertexId);
+                    // Если путь найден
                     if (shortestPath != null)
                     {
+                        // Выводим значение минимальной длины пути
                         pathLengthLabel.Text = shortestPath[0].min_length.ToString();
                         string pathStr = "";
                         for (int i = shortestPath.Count() - 1; i >= 0; i--)
                         {
                             pathStr = pathStr + shortestPath[i].vertex.id.ToString() + " ";
                         }
+                        // Ввыодим путь из вершин
                         shortestPathLabel.Text = pathStr;
+                        // Очищаем поле вывода ошибок
                         debug.Text = "";
                     }
+                    // Если путь не найден
                     else
                     {
                         debug.Text = "Нет кратчайшего пути";
                     }
                 }catch (System.Net.Http.HttpRequestException exception)
                 {
+                    // Выводим сообщения об ошибке, если не удалось отправить запрос на сервер
                     debug.Text = "Ошибка подключения";
                 }
             }
@@ -104,9 +112,11 @@ namespace FedGraph.Client
 
         private async void Form1_Load(object sender, EventArgs e)
         {
+            // Парсинг конфига и создение объекта для создания http запросов
             Service.Initialize();
             try
             {
+                // Выводим количество ребёр в графе
                 nodesNumLabel.Text = Service.getVertexesNum().Result.ToString();
             }
             catch (System.AggregateException exception)
